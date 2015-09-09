@@ -1,0 +1,19 @@
+{
+  "name": "01_getting_started",
+  "version": "0.1.0",
+  "description": "Getting Started",
+  "main": "src/hello.js",
+  "dependencies": {
+    "react": "^0.13.3"
+  },
+  "devDependencies": {
+    "http-server": "^0.8.0",
+    "react-tools": "^0.13.3"
+  },
+  "scripts": {
+    "start": "http-server",
+    "jsx": "jsx src dist"
+  },
+  "author": "",
+  "license": "MIT"
+}
