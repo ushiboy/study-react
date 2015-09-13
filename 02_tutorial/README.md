@@ -343,11 +343,6 @@ module.exports = CommentBox;
 コンポーネントの生成、実行、破棄などのライフサイクルのイベント事に呼ばれるメソッド。
 
 
-##### keyの話
-
-Virtual DOMが効率よく差分を変更するのを助けるために、ユニークなキーを割り当てて使います。
-
-
 #### State の更新
 
 comments.json
@@ -396,8 +391,77 @@ var CommentBox = React.createClass({
 module.exports = CommentBox;
 ```
 
-```javascript
+##### 補足 keyの話
 
+Developer Toolsなどのコンソールを見るとkeyに関してのWarningが確認できる。
+
+Warning: Each child in an array or iterator should have a unique "key" prop. Check the render method of CommentList. See https://fb.me/react-warning-keys for more information.
+
+Reactが効率よく差分を変更するのを助けるために、ユニークなキーを割り当てて使う。
+位置が入れ替わっただけで中身変わらないなどの場合にDOMを完全に再描画せずに要素を移動させる。
+
+keyのための属性が追加されたデータを利用するために、
+urlパラメータを修正してスタティックなJSONファイルからダミーAPIに切り替える。
+
+```javascript
+// src/entry.js
+var React = require('react');
+var CommentBox = require('./CommentBox');
+
+React.render(
+  <CommentBox url="/api/comments" />,
+  document.getElementById('content')
+);
+```
+
+Commentコンポーネントのkey属性にcomment.idを指定する。
+
+```javascript
+// src/CommentList.js
+var React = require('react');
+var Comment = require('./Comment');
+
+var CommentList = React.createClass({
+  render: function() {
+    var commentNodes = this.props.data.map(function(comment) {
+      return (
+          <Comment key={comment.id} author={comment.author}>
+            {comment.text}
+          </Comment>
+        );
+    });
+    return (
+      <div className="commentList">
+        {commentNodes}
+      </div>
+    );
+  }
+});
+
+module.exports = CommentList;
+```
+
+Developer ToolsでWarningが消えていることを確認する。
+keyについての補足はここまで。
+
+
+2秒おきにポーリングしてリストを更新してみる。
+
+CommentBoxの属性としてpollIntervalを渡す。
+
+```javascript
+// src/entry.js
+var React = require('react');
+var CommentBox = require('./CommentBox');
+
+React.render(
+  <CommentBox url="/api/comments" pollInterval={2000} />,
+  document.getElementById('content')
+);
+```
+
+```javascript
+// src/CommentBox.js
 var React = require('react');
 var $ = require('jquery');
 var CommentList = require('./CommentList');
@@ -438,15 +502,6 @@ var CommentBox = React.createClass({
 module.exports = CommentBox;
 ```
 
-```javascript
-var React = require('react');
-var CommentBox = require('./CommentBox');
-
-React.render(
-  <CommentBox url="comments.json" pollInterval={2000} />,
-  document.getElementById('content')
-);
-```
 
 ### 新しいコメントの追加
 
@@ -481,7 +536,7 @@ module.exports = CommentForm;
 ```
 
 ```javascript
-
+// src/CommentBox.js
 var React = require('react');
 var $ = require('jquery');
 var CommentList = require('./CommentList');
@@ -526,6 +581,7 @@ module.exports = CommentBox;
 ```
 
 ```javascript
+// src/CommentForm.js
 var React = require('react');
 
 var CommentForm = React.createClass({
@@ -556,6 +612,7 @@ module.exports = CommentForm;
 ```
 
 ```javascript
+// src/CommentBox.js
 var React = require('react');
 var $ = require('jquery');
 var CommentList = require('./CommentList');
@@ -576,13 +633,15 @@ var CommentBox = React.createClass({
     });
   },
   handleCommentSubmit: function(comment) {
+    var comments = this.state.data;
     $.ajax({
       url: this.props.url,
+      contentType: 'application/json',
       dataType: 'json',
       type: 'POST',
-      data: comment,
+      data: JSON.stringify(comment),
       success: function(data) {
-        this.setState({data: data});
+        this.setState({data: comments.concat([data])});
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(this.props.url, status, err.toString());
@@ -638,11 +697,12 @@ var CommentBox = React.createClass({
     this.setState({ data: newComments });
     $.ajax({
       url: this.props.url,
+      contentType: 'application/json',
       dataType: 'json',
       type: 'POST',
-      data: comment,
+      data: JSON.stringify(comment),
       success: function(data) {
-        this.setState({data: data});
+        this.setState({data: comments.concat([data])});
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(this.props.url, status, err.toString());

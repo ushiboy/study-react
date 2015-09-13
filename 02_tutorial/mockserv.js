@@ -25,4 +25,8 @@ app.post('/api/comments', function(req, res) {
   res.send(JSON.stringify(row));
 });
 
-app.listen(8081);
+module.exports = {
+  start: function() {
+    app.listen(8081);
+  }
+};
