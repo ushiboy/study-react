@@ -5,6 +5,7 @@ var gulp = require('gulp'),
   webpackConfig = require('./webpack.config.js'),
   bundler = webpack(webpackConfig),
   browserSync = require('browser-sync'),
+  proxyMiddleware = require('http-proxy-middleware'),
   reload = browserSync.reload;
 
 gulp.task('webpack:build', function(cb) {
@@ -25,12 +26,20 @@ gulp.task('webserver-dev', function() {
   browserSync({
     server: {
       baseDir: path.join(__dirname),
+      middleware: [
+        proxyMiddleware('/api', { target: 'http://localhost:8081' })
+      ]
     },
     port: 8080,
     open: false
   });
 });
 
-gulp.task('default', ['webpack:build', 'webserver-dev'], function() {
+gulp.task('mock-server', function() {
+  var mockServer = require('./mockserv');
+  mockServer.start();
+});
+
+gulp.task('default', ['webpack:build', 'mock-server', 'webserver-dev'], function() {
   gulp.watch('src/**/*.js', ['webpack:build']);
 });
