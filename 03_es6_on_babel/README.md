@@ -26,15 +26,73 @@ export default class Comment extends React.Component {
 
 ### class構文を利用
 
-あとで
+##### クラス定義と継承
 
-### var to let
+https://babeljs.io/docs/learn-es2015/#classes
 
-あとで
+private, publicなどのアクセス修飾子はなし。
 
-### module import export
+class構文で定義したクラスをnewなしでインスタンス生成しようとするとエラーになる。
 
-あとで
+継承を行った場合、子クラスのコンストラクタ内でsuperを呼ぶ前にthisにアクセスするとエラーになる。
+子クラスのコンストラクタを省略すると、渡された引数を親クラスのコンストラクタに直接渡すことになる。
+
+```javascript
+// クラスの定義
+class Animal {
+
+  // コンストラクタ
+  constructor(name) {
+    // プロパティ
+    this.name = name;
+  }
+
+  // インスタンスメソッド
+  greet() {
+    console.log("Hello, I'm " + this.name);
+  }
+
+  // スタティックメソッド
+  static create(name) {
+    return new Animal(name);
+  }
+}
+
+// 継承
+class Person extends Animal {
+
+  constructor(name) {
+    // 親のコンストラクタ呼び出し（明示的な呼び出しが必要）
+    super(name);
+  }
+
+  greet() {
+    // 親のメソッド呼び出し
+    super.greet();
+  }
+}
+```
+
+##### Reactコンポーネントクラスの作り方
+
+React.Componentクラスを継承してクラスを作る。
+
+### ブロックスコープ
+
+##### letとconstによるブロックスコープ変数の定義
+
+https://babeljs.io/docs/learn-es2015/#let-const
+
+letとconstはブロックスコープな宣言ができる。
+letは再代入可、constは再代入不可。
+
+### モジュール
+
+##### モジュール定義と読み込み
+
+https://babeljs.io/docs/learn-es2015/#modules
+
+
 
 ```javascript
 // src/CommentList.js
@@ -61,9 +119,11 @@ export default class CommentList extends React.Component {
 }
 ```
 
-### arrow function
+### アロー関数
 
-あとで
+##### アロー関数とthisの補足
+
+https://babeljs.io/docs/learn-es2015/#arrows-and-lexical-this
 
 ```javascript
 // src/CommentForm.js
