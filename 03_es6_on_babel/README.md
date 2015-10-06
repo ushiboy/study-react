@@ -92,7 +92,67 @@ letは再代入可、constは再代入不可。
 
 https://babeljs.io/docs/learn-es2015/#modules
 
+名前付きエクスポートとインポート
+```javascript
+// module.js
+export var foo = 'foo';
+export function bar() {};
+export class Baz {
+  baz() {}
+}
 
+// import.js
+import { foo, bar, Baz} from './module';
+console.log(foo); // foo
+bar();
+new Baz();
+
+import { foo as poo} from './module';
+console.log(poo); // foo
+
+import * as module from './module';
+console.log(module.foo); // foo
+```
+
+デフォルトエクスポート
+```javascript
+// foo.js
+export default 'foo';
+
+// bar.js
+export default function() {
+  console.log('bar');
+};
+
+// baz.js
+export default class {
+  baz() {
+    console.log('baz')
+  }
+}
+
+// import.js
+import a from './foo';
+import b from './bar';
+import c from './baz';
+console.log(a); // foo
+b(); // bar
+new c().baz(); // baz
+```
+
+合わせ技
+
+```javascript
+// a.js
+export default "hoge";
+export var aaa = 'bbb';
+
+/// b.js
+import hoge, { aaa } from './a';
+
+console.log(hoge);
+console.log(aaa);
+```
 
 ```javascript
 // src/CommentList.js
@@ -124,6 +184,33 @@ export default class CommentList extends React.Component {
 ##### アロー関数とthisの補足
 
 https://babeljs.io/docs/learn-es2015/#arrows-and-lexical-this
+
+```javascript
+
+var a = (a, b) => {
+  return a + b;
+};
+
+// {}, return 省略
+var b = (a, b) => a + b;
+
+// (), {}, return 省略
+var c = n => n * n;
+
+// 引数がない場合()は省略不可
+var d = () => { return 123; };
+
+// thisの補足
+var hoge = {
+  name: 'test',
+  foo: function() {
+    setTimeout(() => {
+      // thisはhogeになる
+      console.log(this.name);
+    }, 1000);
+  }
+}
+```
 
 ```javascript
 // src/CommentForm.js
