@@ -1,5 +1,7 @@
 # BabelでES6な書き方に挑戦
 
+## Commentコンポーネント
+
 まずCommentコンポーネントを題材に書き換え。
 
 ```javascript
@@ -73,7 +75,7 @@ class Person extends Animal {
 }
 ```
 
-##### Reactコンポーネントクラスの作り方
+##### Reactコンポーネントのクラスの作り方
 
 React.Componentクラスを継承してクラスを作る。
 
@@ -140,7 +142,7 @@ b(); // bar
 new c().baz(); // baz
 ```
 
-合わせ技
+名前付きエクスポートとデフォルトエクスポートの合わせ技
 
 ```javascript
 // a.js
@@ -153,6 +155,10 @@ import hoge, { aaa } from './a';
 console.log(hoge);
 console.log(aaa);
 ```
+
+## CommentListコンポーネント
+
+CommentListを書き換え。
 
 ```javascript
 // src/CommentList.js
@@ -212,6 +218,10 @@ var hoge = {
 }
 ```
 
+## CommentFormコンポーネント
+
+CommentFormの書き換え。
+
 ```javascript
 // src/CommentForm.js
 import React from 'react';
@@ -243,6 +253,21 @@ export default class CommentForm extends React.Component {
 
 }
 ```
+
+##### （つまづきポイント）ハンドラに渡すメソッドのthis
+
+実はReact#createClassには[autoBinding機能](https://github.com/facebook/react/blob/0.13-stable/src/classic/class/ReactClass.js#L694)があった。
+
+React#createClassで生成されたコンポーネントはこれによりメソッドのthisが補足されていたが、
+ES6のclassシンタックスで書くと標準通りになるのでthisを明示的に指定する必要がある。
+
+今回はオーソドックスにFunction#bindを利用してthis.handleSubmitのthisを束縛している。
+
+他の方法は[こちら](http://blog.shouldbee.at/2015/07/06/prevent-undefiend-this-in-react/)を参照。
+
+## CommentBoxコンポーネント
+
+CommentBoxの書き換え。
 
 ```javascript
 // src/CommentBox.js
@@ -307,6 +332,16 @@ export default class CommentBox extends React.Component {
   }
 }
 ```
+
+ライフサイクルメソッドgetInitialStateはES6のclassシンタックスでは使えない。
+そのため、コンストラクタ内で初期化を行う。
+
+こちらでもsetIntervalに渡すloadCommentsFromServerメソッドのthisをbindで指定する。
+
+
+## エントリポイントの書き換え
+
+entryの書き換え
 
 ```javascript
 // src/entry.js
